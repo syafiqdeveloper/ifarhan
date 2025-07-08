@@ -18,4 +18,9 @@ class Dischargesummary extends Model
     {
         return $this->belongsTo(User::class, 'updated_by', 'id');
     }
+
+    public function draftsaveby()
+    {
+        return $this->belongsTo(User::class, 'draftsaveby', 'id');
+    }
 }

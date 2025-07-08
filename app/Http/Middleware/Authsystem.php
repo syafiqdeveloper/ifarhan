@@ -455,6 +455,8 @@ class Authsystem
                 'ireporting/ida/preadmission/getpreadmissioninventory',
                 'ireporting/discharge-summary',
                 'ireporting/discharge-summary/list',
+                'ireporting/pending-discharge-summary',
+                'ireporting/pending-discharge-summary/list',
                 'ireporting/adr',
                 'ireporting/adr/getworklistsuspect',
                 'ireporting/adr/getworklistconfirm',

@@ -424,106 +424,208 @@ class iReportingMainController extends Controller
     }
 
     //begin discharge summary
-    public function indexDischargeSummary(Request $request)
-    {
-        $explode = explode('?', $request->getRequestUri());
-
-        $url = $explode[1];
-
-        return view('ireporting.dischargesummary.index', compact('url'));
-    }
-
-    public function apiGetDataDischargeSummary(Request $request)
-    {
-        try
+        public function indexDischargeSummary(Request $request)
         {
-            $dateRange  = explode(' - ', $request->dateRange);
-            $startDate  = Carbon::createFromFormat('d/m/Y', $dateRange[0])->startOfDay();
-            $endDate    = Carbon::createFromFormat('d/m/Y', $dateRange[1])->endOfDay();
+            $explode = explode('?', $request->getRequestUri());
 
-            $hasDs = Dischargesummary::whereBetween('dischargedate', [$startDate, $endDate])
-                        ->with('createdby', function($q){
-                            $q->select('id', 'name');
-                        })
-                        ->with('updatedby', function($q){
-                            $q->select('id', 'name');
-                        })
-                        ->where('status_id', 2)
-                        ->orderBy('dischargedate', 'desc')
-                        ->get();
+            $url = $explode[1];
 
-            $data = [];
+            return view('ireporting.dischargesummary.index', compact('url'));
+        }
 
-            // dd($hasDs);
-
-            foreach($hasDs as $ds)
+        public function apiGetDataDischargeSummary(Request $request)
+        {
+            try
             {
-                $temp = [];
+                $dateRange  = explode(' - ', $request->dateRange);
+                $startDate  = Carbon::createFromFormat('d/m/Y', $dateRange[0])->startOfDay();
+                $endDate    = Carbon::createFromFormat('d/m/Y', $dateRange[1])->endOfDay();
 
-                $getPatInfo = PatientInformation::where('status_id', 2)
-                                ->select('id', 'patient_id', 'episodenumber', 'epsiodedate')
-                                ->where('id', $ds['patientinformation_id'])
-                                ->with('patient', function($q){
-                                    $q->select('id', 'mrn', 'name');
-                                })
-                                ->first();
+                $hasDs = Dischargesummary::whereBetween('dischargedate', [$startDate, $endDate])
+                            ->with('createdby', function($q){
+                                $q->select('id', 'name');
+                            })
+                            ->with('updatedby', function($q){
+                                $q->select('id', 'name');
+                            })
+                            ->where('status_id', 2)
+                            ->orderBy('dischargedate', 'desc')
+                            ->get();
 
-                $temp['name']                       = $getPatInfo['patient']['name'];
-                $temp['mrn']                        = $getPatInfo['patient']['mrn'];
-                $temp['episode']                    = $getPatInfo['episodenumber'];
-                $temp['episodedate']                = Carbon::parse($getPatInfo['epsiodedate'])->format('Y-m-d');
-                $temp['dischargedate']              = Carbon::parse($ds['dischargedate'])->format('Y-m-d');
-                $temp['reasonforadmission']         = $ds['reasonforadmission'];
-                $temp['primarydiagnosis']           = $ds['primarydiagnosis'];
-                $temp['secondarydiagnosis']         = $ds['secondarydiagnosis'];
-                $temp['previoussurgery']            = $ds['previoussurgery'];
-                $temp['relevantphysicalfinding']    = $ds['relevantphysicalfinding'];
-                $temp['principalprocedurefinding']  = $ds['principalprocedurefinding'];
-                $temp['briefhospitalcourse']        = $ds['briefhospitalcourse'];
-                $temp['briefhospitalcoursedesc']    = $ds['briefhospitalcoursedesc'];
-                $temp['significantinpatientmed']    = $ds['significantinpatientmed'];
-                $temp['conditionpatientdis']        = $ds['conditionpatientdis'];
-                $temp['dischargemedication']        = $ds['dischargemedication'];
-                $temp['followupcareclinicvisit']    = $ds['followupcareclinicvisit'];
-                $temp['planmanagement']             = $ds['planmanagement'];
-                $temp['referringdoctoraddress']     = $ds['referringdoctoraddress'];
-                $temp['finalby']                    = $ds['finalby'];
-                $temp['createdby']                  = $ds['createdby']['name'];
-                $temp['createdat']                  = $ds['created_at'];
-                $temp['updatedby']                  = $ds['updatedby'] != null ? $ds['updatedby']['name'] : null;
-                $temp['updatedat']                  = $ds['updated_at'] != null ? $ds['updated_at'] : null;
+                $data = [];
 
-                array_push($data, $temp);
+                // dd($hasDs);
+
+                foreach($hasDs as $ds)
+                {
+                    $temp = [];
+
+                    $getPatInfo = PatientInformation::where('status_id', 2)
+                                    ->select('id', 'patient_id', 'episodenumber', 'epsiodedate')
+                                    ->where('id', $ds['patientinformation_id'])
+                                    ->with('patient', function($q){
+                                        $q->select('id', 'mrn', 'name');
+                                    })
+                                    ->first();
+
+                    $temp['name']                       = $getPatInfo['patient']['name'];
+                    $temp['mrn']                        = $getPatInfo['patient']['mrn'];
+                    $temp['episode']                    = $getPatInfo['episodenumber'];
+                    $temp['episodedate']                = Carbon::parse($getPatInfo['epsiodedate'])->format('Y-m-d');
+                    $temp['dischargedate']              = Carbon::parse($ds['dischargedate'])->format('Y-m-d');
+                    $temp['reasonforadmission']         = $ds['reasonforadmission'];
+                    $temp['primarydiagnosis']           = $ds['primarydiagnosis'];
+                    $temp['secondarydiagnosis']         = $ds['secondarydiagnosis'];
+                    $temp['previoussurgery']            = $ds['previoussurgery'];
+                    $temp['relevantphysicalfinding']    = $ds['relevantphysicalfinding'];
+                    $temp['principalprocedurefinding']  = $ds['principalprocedurefinding'];
+                    $temp['briefhospitalcourse']        = $ds['briefhospitalcourse'];
+                    $temp['briefhospitalcoursedesc']    = $ds['briefhospitalcoursedesc'];
+                    $temp['significantinpatientmed']    = $ds['significantinpatientmed'];
+                    $temp['conditionpatientdis']        = $ds['conditionpatientdis'];
+                    $temp['dischargemedication']        = $ds['dischargemedication'];
+                    $temp['followupcareclinicvisit']    = $ds['followupcareclinicvisit'];
+                    $temp['planmanagement']             = $ds['planmanagement'];
+                    $temp['referringdoctoraddress']     = $ds['referringdoctoraddress'];
+                    $temp['finalby']                    = $ds['finalby'];
+                    $temp['createdby']                  = $ds['createdby']['name'];
+                    $temp['createdat']                  = $ds['created_at'];
+                    $temp['updatedby']                  = $ds['updatedby'] != null ? $ds['updatedby']['name'] : null;
+                    $temp['updatedat']                  = $ds['updated_at'] != null ? $ds['updated_at'] : null;
+
+                    array_push($data, $temp);
+                }
+
+                $response = response()->json(
+                    [
+                      'status'  => 'success',
+                      'data'    => $data
+                    ], 200
+                );
+
+                return $response;
             }
+            catch(\Exception $e)
+            {
+                Log::error($e->getMessage(), [
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine()
+                    ]
+                );
 
-            $response = response()->json(
-                [
-                  'status'  => 'success',
-                  'data'    => $data
-                ], 200
-            );
+                $response = response()->json(
+                    [
+                        'status'  => 'failed',
+                        'message' => 'Internal error happened. Try again'
+                    ], 200
+                );
 
-            return $response;
+                return $response;
+            }
         }
-        catch(\Exception $e)
-        {
-            Log::error($e->getMessage(), [
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine()
-                ]
-            );
-
-            $response = response()->json(
-                [
-                    'status'  => 'failed',
-                    'message' => 'Internal error happened. Try again'
-                ], 200
-            );
-
-            return $response;
-        }
-    }
     //end discharge esummary
+
+    //begin discharge summary unfinalized
+        public function indexDischargeSummaryUnfinalized(Request $request)
+        {
+            $explode = explode('?', $request->getRequestUri());
+
+            $url = $explode[1];
+
+            return view('ireporting.dischargesummaryunfinalized.index', compact('url'));
+        }
+
+        public function apiGetDataDischargeSummaryUnfinalized(Request $request)
+        {
+            try
+            {
+                $dateRange  = explode(' - ', $request->dateRange);
+                $startDate  = Carbon::createFromFormat('d/m/Y', $dateRange[0])->startOfDay();
+                $endDate    = Carbon::createFromFormat('d/m/Y', $dateRange[1])->endOfDay();
+
+                $hasDs = Dischargesummary::whereBetween('dischargedate', [$startDate, $endDate])
+                            ->with('createdby', function($q){
+                                $q->select('id', 'name');
+                            })
+                            ->with('updatedby', function($q){
+                                $q->select('id', 'name');
+                            })
+                            ->with('draftsaveby', function($q){
+                                $q->select('id', 'name');
+                            })
+                            ->where('finalsave', 1)
+                            ->where('status_id', 2)
+                            ->orderBy('dischargedate', 'desc')
+                            ->get();
+
+                $data = [];
+
+                $getDateNow = Carbon::parse(Carbon::now())->format('Y-m-d');
+
+                foreach($hasDs as $ds)
+                {
+                    $temp = [];
+
+                    $getPatInfo = PatientInformation::where('status_id', 2)
+                                    ->select('id', 'patient_id', 'episodenumber', 'epsiodedate', 'consultantname')
+                                    ->where('id', $ds['patientinformation_id'])
+                                    ->with('patient', function($q){
+                                        $q->select('id', 'mrn', 'name');
+                                    })
+                                    ->first();
+
+                    $temp['mrn']                    = $getPatInfo['patient']['mrn'];
+                    $temp['name']                   = $getPatInfo['patient']['name'];
+                    $temp['consultantname']         = $getPatInfo['consultantname'];
+                    $temp['episode']                = $getPatInfo['episodenumber'];
+                    $temp['ward']                   = $getPatInfo['epiward'];
+                    $temp['dischargedate']          = Carbon::parse($ds['dischargedate'])->format('Y-m-d');
+                    $temp['dischargedsummaryentry'] = Carbon::parse($ds['created_at'])->format('Y-m-d');
+                    $temp['finalby']                = $ds['finalby'];
+                    $temp['totaldayspending']       = 0;
+
+                    if($getDateNow >= '2025-07-05')
+                    {
+                        $temp['savedraftby'] = $ds['draftsaveby'] != null ? $ds['draftsaveby']['name'] : null;
+                        $temp['savedraftat'] = $ds['draftsaveat'] != null ? $Carbon::parse($ds['draftsaveat'])->format('Y-m-d') : null;
+                    }
+                    else
+                    {
+                        $temp['savedraftby'] = $ds['updatedby'] != null ? $ds['updatedby']['name'] : null;
+                        $temp['savedraftat'] = $ds['updated_at'] != null ? $Carbon::parse($ds['updated_at'])->format('Y-m-d') : null;
+                    }
+
+                    array_push($data, $temp);
+                }
+
+                $response = response()->json(
+                    [
+                      'status'  => 'success',
+                      'data'    => $data
+                    ], 200
+                );
+
+                return $response;
+            }
+            catch(\Exception $e)
+            {
+                Log::error($e->getMessage(), [
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine()
+                    ]
+                );
+
+                $response = response()->json(
+                    [
+                        'status'  => 'failed',
+                        'message' => 'Internal error happened. Try again'
+                    ], 200
+                );
+
+                return $response;
+            }
+        }
+    //end discharge summary unfinalized
 
     public function genReportConfirm(Request $request)
     {
