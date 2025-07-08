@@ -553,14 +553,14 @@ class iReportingMainController extends Controller
                             ->with('draftsaveby', function($q){
                                 $q->select('id', 'name');
                             })
-                            ->whereNull('finalsaveby')
+                            ->where('finalsave', 1)
                             ->where('status_id', 2)
                             ->orderBy('dischargedate', 'desc')
                             ->get();
 
                 $data = [];
 
-                // dd($hasDs);
+                $getDateNow = Carbon::parse(Carbon::now())->format('Y-m-d');
 
                 foreach($hasDs as $ds)
                 {
@@ -574,17 +574,26 @@ class iReportingMainController extends Controller
                                     })
                                     ->first();
 
-                    $temp['mrn']                        = $getPatInfo['patient']['mrn'];
-                    $temp['name']                       = $getPatInfo['patient']['name'];
-                    $temp['consultantname']             = $getPatInfo['consultantname'];
-                    $temp['episode']                    = $getPatInfo['episodenumber'];
-                    $temp['ward']                       = $getPatInfo['epiward'];
-                    $temp['dischargedate']              = Carbon::parse($ds['dischargedate'])->format('Y-m-d');
-                    $temp['dischargedsummaryentry']     = Carbon::parse($ds['created_at'])->format('Y-m-d');
-                    $temp['finalby']                    = $ds['finalby'];
-                    $temp['totaldayspending']           = 0;
-                    $temp['savedraftby']                = $ds['draftsaveby'] != null ? $ds['draftsaveby']['name'] : null;
-                    $temp['savedraftat']                = $ds['draftsaveat'] != null ? $Carbon::parse($ds['draftsaveat'])->format('Y-m-d') : null;
+                    $temp['mrn']                    = $getPatInfo['patient']['mrn'];
+                    $temp['name']                   = $getPatInfo['patient']['name'];
+                    $temp['consultantname']         = $getPatInfo['consultantname'];
+                    $temp['episode']                = $getPatInfo['episodenumber'];
+                    $temp['ward']                   = $getPatInfo['epiward'];
+                    $temp['dischargedate']          = Carbon::parse($ds['dischargedate'])->format('Y-m-d');
+                    $temp['dischargedsummaryentry'] = Carbon::parse($ds['created_at'])->format('Y-m-d');
+                    $temp['finalby']                = $ds['finalby'];
+                    $temp['totaldayspending']       = 0;
+
+                    if($getDateNow >= '2025-07-05')
+                    {
+                        $temp['savedraftby'] = $ds['draftsaveby'] != null ? $ds['draftsaveby']['name'] : null;
+                        $temp['savedraftat'] = $ds['draftsaveat'] != null ? $Carbon::parse($ds['draftsaveat'])->format('Y-m-d') : null;
+                    }
+                    else
+                    {
+                        $temp['savedraftby'] = $ds['updatedby'] != null ? $ds['updatedby']['name'] : null;
+                        $temp['savedraftat'] = $ds['updated_at'] != null ? $Carbon::parse($ds['updated_at'])->format('Y-m-d') : null;
+                    }
 
                     array_push($data, $temp);
                 }
