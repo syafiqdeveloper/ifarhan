@@ -106,6 +106,19 @@
 				href="{{ route('report.dischargesummary') }}?{{$url}}" style="margin-bottom: 10px;">Discharge Summary</a>
 		</div>
 	</div>
+	<div class="row {{ request()->routeIs('report.dischargesummary.unfinalized') ? 'bg-teal text-white' : '' }}" 
+		style="padding: 0.5rem; margin: auto; border-bottom: solid 1px #918f8f;">
+		<div class="col-2 mt-2">
+			<a class="text-hover-success {{ request()->routeIs('report.dischargesummary.unfinalized') ? 'display-none' : 'display-block' }}" href="#" id="expandhr" style="margin-bottom: 10px; display: block;">
+				<i class="fas fa-angle-right fs-3 {{ request()->routeIs('report.dischargesummary.unfinalized') ? 'color-white' : 'color-teal' }}" 
+					style="float: right; margin-bottom: 10px;"></i>
+			</a>
+		</div>
+		<div class="col-10 mt-2" style="padding-left: 0px;">
+			<a class="text-hover-success {{ request()->routeIs('report.dischargesummary.unfinalized') ? 'text-white' : 'text-dark' }}" 
+				href="{{ route('report.dischargesummary.unfinalized') }}?{{$url}}" style="margin-bottom: 10px;">Pending Discharge Summary: Unfinalized Patient Records</a>
+		</div>
+	</div>
 @endif
 
 @if(in_array($usrGrp, ["Administrator"]))

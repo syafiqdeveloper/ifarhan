@@ -180,15 +180,22 @@ Route::group(['middleware' => ['authsystem']], function() {
                 Route::get('/generateconfirm', [iReportingMainController::class, 'genReportConfirm'])->name('report.iblood.atr.generateconfirm');   
             });
         });
+
         Route::group(['prefix' => 'ida'], function () {
             Route::group(['prefix' => 'preadmission'], function () {
                 Route::get('/', [iReportingMainController::class, 'indexPreAdmission'])->name('report.ida.preadmission.index');
                 Route::get('/getpreadmissioninventory', [iReportingMainController::class, 'getPreAdmissionInventory'])->name('report.ida.preadmission.getinventory');
             });
         });
+
         Route::group(['prefix' => 'discharge-summary'], function () {
             Route::get('/', [iReportingMainController::class, 'indexDischargeSummary'])->name('report.dischargesummary');
             Route::get('/list', [iReportingMainController::class, 'apiGetDataDischargeSummary'])->name('report.dischargesummary.list');
+        });
+
+        Route::group(['prefix' => 'pending-discharge-summary'], function () {
+            Route::get('/', [iReportingMainController::class, 'indexDischargeSummaryUnfinalized'])->name('report.dischargesummary.unfinalized');
+            Route::get('/list', [iReportingMainController::class, 'apiGetDataDischargeSummaryUnfinalized'])->name('report.dischargesummary.unfinalized.list');
         });
 
         Route::group(['prefix' => 'adr'], function () {
